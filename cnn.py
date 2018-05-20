@@ -25,24 +25,25 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
   # Create the model
   model = Sequential()
 
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', activation='relu', input_shape=(32, 32, 3)))
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', activation='relu'))
+  model.add(Conv2D(128, kernel_size=(3, 3), padding='valid', activation='relu', input_shape=(32, 32, 3)))
+  model.add(Conv2D(128, kernel_size=(3, 3), padding='valid', activation='relu'))
   model.add(MaxPooling2D(pool_size=(2, 2)))
   model.add(Dropout(0.25))
 
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', activation='relu'))
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', activation='relu'))
+  model.add(Conv2D(128, kernel_size=(3, 3), padding='valid', activation='relu'))
+  model.add(Conv2D(128, kernel_size=(3, 3), padding='valid', activation='relu'))
   model.add(MaxPooling2D(pool_size=(2, 2)))
   model.add(Dropout(0.25))
 
-  model.add(Conv2D(256, kernel_size=(2, 2), padding='same', activation='relu'))
+  model.add(Conv2D(256, kernel_size=(2, 2), padding='valid', activation='relu'))
   model.add(MaxPooling2D(pool_size=(2, 2)))
   model.add(Dropout(0.25))
 
   model.add(Flatten())
-  model.add(Dense(512, activation='selu', kernel_initializer='lecun_uniform'))
-  model.add(Dense(512, activation='selu', kernel_initializer='lecun_uniform'))
+  model.add(Dense(1024, activation='selu', kernel_initializer='lecun_uniform'))
   model.add(Dropout(0.5))
+  model.add(Dense(512, activation='selu', kernel_initializer='lecun_uniform'))
+  
   model.add(Dense(10, activation='softmax', kernel_initializer='lecun_uniform'))
 
   #opt = RMSprop(lr=0.001, decay=0.0)
