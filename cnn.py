@@ -25,17 +25,17 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
   # Create the model
   model = Sequential()
 
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', kernel_initializer='he_uniform', activation='relu', input_shape=(32, 32, 3)))
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', kernel_initializer='he_uniform', activation='relu'))
+  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', activation='relu', input_shape=(32, 32, 3)))
+  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', activation='relu'))
   model.add(MaxPooling2D(pool_size=(2, 2)))
   model.add(Dropout(0.25))
 
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', kernel_initializer='he_uniform', activation='relu'))
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', kernel_initializer='he_uniform', activation='relu'))
+  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', activation='relu'))
+  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', activation='relu'))
   model.add(MaxPooling2D(pool_size=(2, 2)))
   model.add(Dropout(0.25))
 
-  model.add(Conv2D(256, kernel_size=(2, 2), padding='same', kernel_initializer='he_uniform', activation='relu'))
+  model.add(Conv2D(256, kernel_size=(2, 2), padding='same', activation='relu'))
   model.add(MaxPooling2D(pool_size=(2, 2)))
   model.add(Dropout(0.25))
 
@@ -48,7 +48,7 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
   #opt = RMSprop(lr=0.001, decay=0.0)
   #opt = Adagrad(lr=0.01, decay=0.0)
   #opt = Adadelta(lr=1.0, decay=0.0)
-  opt = Adam(lr=0.00005, decay=1e-6)
+  opt = Adam(lr=0.0001, decay=5e-6)
   # Compile the model
   model.compile(loss='categorical_crossentropy',
                 optimizer=opt,
@@ -61,7 +61,7 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
             shuffle=True,
             epochs=250,
             validation_data=(X_train[val_idx], to_categorical(Y_train[val_idx])),
-            callbacks=[EarlyStopping(min_delta=0.001, patience=3), CSVLogger('trainning.log', separator=',', append=False), checkpoint])
+            callbacks=[EarlyStopping(min_delta=0.001, patience=3), CSVLogger('training.log', separator=',', append=False), checkpoint])
   k_models.append(model)
 # Evaluate the model
 #scores = model.evaluate(X_test, to_categorical(Y_test))
