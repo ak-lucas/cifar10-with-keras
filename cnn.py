@@ -1,13 +1,17 @@
 # -*- coding: utf8 -*-
+import os
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
+
 import numpy as np
 
 from keras.callbacks import EarlyStopping, CSVLogger, ModelCheckpoint
 from keras.datasets import cifar10
 from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Flatten
+from keras.layers.core import Dense, Dropout, Flatten, Activation
 from keras.layers.convolutional import Conv2D
 from keras.optimizers import Adam, Adadelta, Adagrad, RMSprop
 from keras.layers.pooling import MaxPooling2D
+from keras.layers.normalization import BatchNormalization
 from keras.utils import to_categorical
 
 
@@ -21,24 +25,58 @@ np.random.seed(1000)
 kfold = KFold(n_splits=3)
 
 k_models = []
+fold = 1
 for train_idx, val_idx in kfold.split(X_train, Y_train):
   # Create the model
   model = Sequential()
 
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='valid', activation='relu', input_shape=(32, 32, 3)))
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='valid', activation='relu'))
+  # conv 1
+  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', input_shape=(32, 32, 3)))
+  model.add(BatchNormalization())
+  model.add(Activation('relu'))
+
+  # conv 2
+  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', activation='relu'))
+  model.add(BatchNormalization())
+  model.add(Activation('relu'))
+  # pool 1
   model.add(MaxPooling2D(pool_size=(2, 2)))
+  # dropout 1
   model.add(Dropout(0.25))
 
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='valid', activation='relu'))
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='valid', activation='relu'))
+  # conv 1
+  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', input_shape=(32, 32, 3)))
+  model.add(BatchNormalization())
+  model.add(Activation('relu'))
+
+  # conv 2
+  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', activation='relu'))
+  model.add(BatchNormalization())
+  model.add(Activation('relu'))
+  # pool 1
   model.add(MaxPooling2D(pool_size=(2, 2)))
+  # dropout 1
   model.add(Dropout(0.25))
 
-  model.add(Conv2D(256, kernel_size=(2, 2), padding='valid', activation='relu'))
+  # conv 3
+  model.add(Conv2D(128, kernel_size=(3, 3), padding='valid'))
+  model.add(BatchNormalization())
+  model.add(Activation('relu'))
+  # pool 2
   model.add(MaxPooling2D(pool_size=(2, 2)))
+  # dropout 2
+  model.add(Dropout(0.25))
+ 
+  # conv 4
+  model.add(Conv2D(128, kernel_size=(3, 3), padding='valid', activation='relu'))
+  model.add(BatchNormalization())
+  model.add(Activation('relu'))
+  # pool 3
+  model.add(MaxPooling2D(pool_size=(2, 2)))
+  # dropout 3
   model.add(Dropout(0.25))
 
+  # FC
   model.add(Flatten())
   model.add(Dense(1024, activation='selu', kernel_initializer='lecun_uniform'))
   model.add(Dropout(0.5))
@@ -46,10 +84,10 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
   
   model.add(Dense(10, activation='softmax', kernel_initializer='lecun_uniform'))
 
-  #opt = RMSprop(lr=0.001, decay=0.0)
-  #opt = Adagrad(lr=0.01, decay=0.0)
-  #opt = Adadelta(lr=1.0, decay=0.0)
-  opt = Adam(lr=0.0001, decay=5e-6)
+  #opt = RMSprop(lr=0.001, decay=1e-9)
+  opt = Adagrad(lr=0.001, decay=1e-6)
+  #opt = Adadelta(lr=0.075, decay=1e-6)
+  #opt = Adam(lr=0.0001, decay=1e-6)
   # Compile the model
   model.compile(loss='categorical_crossentropy',
                 optimizer=opt,
@@ -62,8 +100,9 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
             shuffle=True,
             epochs=250,
             validation_data=(X_train[val_idx], to_categorical(Y_train[val_idx])),
-            callbacks=[EarlyStopping(min_delta=0.001, patience=3), CSVLogger('training.log', separator=',', append=False), checkpoint])
+            callbacks=[EarlyStopping(min_delta=0.001, patience=5), CSVLogger('training_' + 'fold_' + str(fold) + '.log', separator=',', append=False), checkpoint])
   k_models.append(model)
+  fold += 1
 # Evaluate the model
 #scores = model.evaluate(X_test, to_categorical(Y_test))
 #print('Accuracy: %.3f' % scores[1])
