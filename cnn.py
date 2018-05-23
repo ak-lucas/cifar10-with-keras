@@ -30,53 +30,32 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
   # Create the model
   model = Sequential()
 
-  # conv 1
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', input_shape=(32, 32, 3)))
+  
+  model.add(Conv2D(128, kernel_size=(3, 3), padding='valid', input_shape=(32, 32, 3))) # 30x30
   model.add(BatchNormalization())
   model.add(Activation('relu'))
-
-  # conv 2
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', activation='relu'))
+  model.add(Conv2D(128, kernel_size=(3, 3), padding='valid', activation='relu')) # 28x28
   model.add(BatchNormalization())
   model.add(Activation('relu'))
-  # pool 1
-  model.add(MaxPooling2D(pool_size=(2, 2)))
-  # dropout 1
+  model.add(MaxPooling2D(pool_size=(2, 2))) # 14x14
   model.add(Dropout(0.25))
 
-  # conv 1
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', input_shape=(32, 32, 3)))
-  model.add(BatchNormalization())
-  model.add(Activation('relu'))
 
-  # conv 2
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='same', activation='relu'))
+	model.add(Conv2D(128, kernel_size=(3, 3), padding='valid', input_shape=(32, 32, 3))) # 12x12
   model.add(BatchNormalization())
   model.add(Activation('relu'))
-  # pool 1
-  model.add(MaxPooling2D(pool_size=(2, 2)))
-  # dropout 1
+  model.add(Conv2D(128, kernel_size=(3, 3), padding='valid', activation='relu')) # 10x10
+  model.add(BatchNormalization())
+  model.add(Activation('relu'))
+  model.add(MaxPooling2D(pool_size=(2, 2))) # 5x5
   model.add(Dropout(0.25))
 
-  # conv 3
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='valid'))
+  model.add(Conv2D(512, kernel_size=(2, 2), padding='valid', activation='relu')) # 4x4
   model.add(BatchNormalization())
   model.add(Activation('relu'))
-  # pool 2
-  model.add(MaxPooling2D(pool_size=(2, 2)))
-  # dropout 2
-  model.add(Dropout(0.25))
- 
-  # conv 4
-  model.add(Conv2D(128, kernel_size=(3, 3), padding='valid', activation='relu'))
-  model.add(BatchNormalization())
-  model.add(Activation('relu'))
-  # pool 3
-  model.add(MaxPooling2D(pool_size=(2, 2)))
-  # dropout 3
-  model.add(Dropout(0.25))
+  model.add(MaxPooling2D(pool_size=(2, 2))) # 2x2
+  model.add(Dropout(0.25))  
 
-  # FC
   model.add(Flatten())
   model.add(Dense(1024, activation='selu', kernel_initializer='lecun_uniform'))
   model.add(Dropout(0.5))
@@ -85,9 +64,9 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
   model.add(Dense(10, activation='softmax', kernel_initializer='lecun_uniform'))
 
   #opt = RMSprop(lr=0.001, decay=1e-9)
-  opt = Adagrad(lr=0.001, decay=1e-6)
+  #opt = Adagrad(lr=0.001, decay=1e-6)
   #opt = Adadelta(lr=0.075, decay=1e-6)
-  #opt = Adam(lr=0.0001, decay=1e-6)
+  opt = Adam(lr=0.0001, decay=1e-6)
   # Compile the model
   model.compile(loss='categorical_crossentropy',
                 optimizer=opt,
