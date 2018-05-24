@@ -74,7 +74,7 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
 	#opt = RMSprop(lr=0.001, decay=1e-9)
 	#opt = Adagrad(lr=0.001, decay=1e-6)
 	#opt = Adadelta(lr=0.075, decay=1e-6)
-	opt = Adam(lr=0.002, decay=25e-6, amsgrad=True)
+	opt = Adam(lr=0.002, decay=1e-4, amsgrad=True)
 	# Compile the model
 	model.compile(loss='categorical_crossentropy',
 								optimizer=opt,
