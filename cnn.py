@@ -57,7 +57,7 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
 	#model.add(BatchNormalization())
 	#model.add(Activation('relu'))
 	model.add(MaxPooling2D(pool_size=(2, 2))) # 2x2
-	model.add(Dropout(0.25))  
+	model.add(Dropout(0.5))  
 
 	model.add(Flatten())
 
@@ -74,7 +74,7 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
 	#opt = RMSprop(lr=0.001, decay=1e-9)
 	#opt = Adagrad(lr=0.001, decay=1e-6)
 	#opt = Adadelta(lr=0.075, decay=1e-6)
-	opt = Adam(lr=0.001, decay=1e-4)
+	opt = Adam(lr=0.002, decay=25e-6, amsgrad=True)
 	# Compile the model
 	model.compile(loss='categorical_crossentropy',
 								optimizer=opt,
@@ -83,11 +83,11 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
 	checkpoint = ModelCheckpoint('saved_models/model_fold_' + str(fold) + '_{epoch:002d}--{val_loss:.2f}.hdf5', save_best_only=True)
 	# Train the model
 	model.fit(X_train[train_idx], to_categorical(Y_train[train_idx]),
-						batch_size=100,
+						batch_size=128,
 						shuffle=True,
 						epochs=250,
 						validation_data=(X_train[val_idx], to_categorical(Y_train[val_idx])),
-						callbacks=[EarlyStopping(min_delta=0.001, patience=10), CSVLogger('training_fold_' + str(fold) + '.log', separator=',', append=False), checkpoint])
+						callbacks=[EarlyStopping(min_delta=0.001, patience=20), CSVLogger('training_fold_' + str(fold) + '.log', separator=',', append=False), checkpoint])
 	k_models.append(model)
 	fold += 1
 # Evaluate the model
