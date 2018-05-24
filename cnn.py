@@ -30,13 +30,14 @@ fold = 1
 
 # data generator com augmentation - para o treino
 datagen_aug = ImageDataGenerator(
-    rotation_range=20,
-    width_shift_range=0.2,
-    height_shift_range=0.2,
+#    rotation_range=5,
+#    width_shift_range=0.2,
+#    height_shift_range=0.2,
+#    rescale=1./255,
     horizontal_flip=True)
 
 # data generator sem o augmentation - para a validação
-datagen_no_aug = ImageDataGenerator()
+datagen_no_aug = ImageDataGenerator(rescale=1./255)
 
 for train_idx, val_idx in kfold.split(X_train, Y_train):
 	# Create the model
@@ -86,7 +87,7 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
 	#opt = RMSprop(lr=0.001, decay=1e-9)
 	#opt = Adagrad(lr=0.001, decay=1e-6)
 	#opt = Adadelta(lr=0.075, decay=1e-6)
-	opt = Adam(lr=0.001, decay=1e-4)
+	opt = Adam(lr=0.005, decay=1e-4)
 	# Compile the model
 	model.compile(loss='categorical_crossentropy',
 								optimizer=opt,
@@ -96,7 +97,7 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
 	
 	# treina e valida o modelo - sem data augmentation
 	#model.fit(X_train[train_idx], to_categorical(Y_train[train_idx]),
-	#					batch_size=100,
+	#					batch_size=128,
 	#					shuffle=True,
 	#					epochs=250,
 	#					validation_data=(X_train[val_idx], to_categorical(Y_train[val_idx])),
@@ -108,11 +109,10 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
 	model.fit_generator(
 										train_generator,
                     steps_per_epoch=len(X_train[train_idx]) / 128,
-                    epochs=250,
+                    epochs=500,
                     shuffle=True,
                     validation_data=(X_train[val_idx], to_categorical(Y_train[val_idx])),
-                    callbacks=[EarlyStopping(min_delta=0.001, patience=10), CSVLogger('training_fold_' + str(fold) + '.log', separator=',', append=False), checkpoint])
-	k_models.append(model)
+                    callbacks=[EarlyStopping(min_delta=0.001, patience=20), CSVLogger('training_fold_' + str(fold) + '.log', separator=',', append=False), checkpoint])
 
 
 	fold += 1
