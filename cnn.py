@@ -14,6 +14,7 @@ from keras.layers.pooling import MaxPooling2D
 from keras.layers.normalization import BatchNormalization
 from keras.utils import to_categorical
 
+from keras.preprocessing.image import ImageDataGenerator
 
 from sklearn.model_selection import StratifiedKFold as KFold
 
