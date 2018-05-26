@@ -93,7 +93,7 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
 								optimizer=opt,
 								metrics=['accuracy'])
 
-	checkpoint = ModelCheckpoint('saved_models/model_fold_' + str(fold) + '_{epoch:002d}--{val_loss:.2f}.hdf5', save_best_only=True)
+	checkpoint = ModelCheckpoint('saved_models/model_fold_' + str(fold) + '_{epoch:002d}--{loss:.2f}--{val_loss:.2f}.hdf5', save_best_only=True)
 	
 	# treina e valida o modelo - sem data augmentation
 	#model.fit(X_train[train_idx], to_categorical(Y_train[train_idx]),
