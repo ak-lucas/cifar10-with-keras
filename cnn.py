@@ -81,8 +81,8 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
 	#model.add(Dense(128, activation='selu', kernel_initializer='lecun_uniform'))
 
 	model.add(Dense(10, kernel_initializer='lecun_uniform'))
-        model.add(BatchNormalization())
-        model.add(Activation('softmax'))
+	model.add(BatchNormalization())
+	model.add(Activation('softmax'))
 
 	#opt = RMSprop(lr=0.001, decay=1e-9)
 	#opt = Adagrad(lr=0.001, decay=1e-6)
@@ -108,14 +108,11 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
 	#val_generator = datagen_no_aug.flow(X_train[val_idx], to_categorical(Y_train[val_idx]))
 	model.fit_generator(
 										train_generator,
-                    steps_per_epoch=len(X_train[train_idx]) / 128,
-                    epochs=500,
-                    shuffle=True,
-                    validation_data=(X_train[val_idx], to_categorical(Y_train[val_idx])),
-                    callbacks=[EarlyStopping(min_delta=0.001, patience=20), CSVLogger('training_fold_' + str(fold) + '.log', separator=',', append=False), checkpoint])
+										steps_per_epoch=len(X_train[train_idx]) / 128,
+										epochs=500,
+										shuffle=True,
+										validation_data=(X_train[val_idx], to_categorical(Y_train[val_idx])),
+										callbacks=[EarlyStopping(min_delta=0.001, patience=20), CSVLogger('training_fold_' + str(fold) + '.log', separator=',', append=False), checkpoint])
 
 
 	fold += 1
-# Evaluate the model
-#scores = model.evaluate(X_test, to_categorical(Y_test))
-#print('Accuracy: %.3f' % scores[1])
