@@ -54,7 +54,7 @@ for train_idx, val_idx in kfold.split(X_train, Y_train):
 	model.add(Dropout(0.25))
 
 
-	model.add(Conv2D(64, kernel_size=(3, 3), padding='valid', input_shape=(32, 32, 3))) # 12x12
+	model.add(Conv2D(64, kernel_size=(3, 3), padding='valid')) # 12x12
 	model.add(BatchNormalization())
 	model.add(Activation('relu'))
 	model.add(Conv2D(64, kernel_size=(3, 3), padding='valid')) # 10x10
